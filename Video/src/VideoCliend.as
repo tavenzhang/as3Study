@@ -127,7 +127,6 @@ public class VideoCliend extends Sprite {
             this.cam.setQuality(0, 90);
             this.cam.setLoopback(false);
         }
-
     }
 
     private function onPauseEvent(evt:Event):void {
@@ -283,7 +282,7 @@ public class VideoCliend extends Sprite {
         {
             if (this.pnc && this.pnc.connected) {
                 serverTextArea.text += "\n第一次验证: " + funNamme + "\n";
-                this.pnc.call(funNamme, null, int(Math.random() * 999));
+                this.pnc.call(funNamme, null,111112);
             }
             else {
                 serverTextArea.text += "请先正常连接服务器\n";
@@ -293,7 +292,7 @@ public class VideoCliend extends Sprite {
         {
             if (this.nc && this.nc.connected) {
                 serverTextArea2.text += "\n调用服务器函数: " + funNamme + "\n";
-                this.nc.call(funNamme, null, int(Math.random() * 999));
+                this.nc.call(funNamme, null, 22222);
             }
             else {
                 serverTextArea2.text += "请先正常连接服务器";
@@ -307,7 +306,9 @@ public class VideoCliend extends Sprite {
             trace("_isValidPush----服务器函数返回参数个数: " + args.length + "args-----" +args+"\n");
             if (args.length = 3) {
                 if (args[2] > 1) {
+                    trace("pre-------------args[2]=="+args[2]);
                     var key:Number = encrypt(args[2]);
+                    trace("end-------------args[2]=="+key)
                     this.pnc.call("netping", null, key);
                     serverTextArea.text += "开始二次验证\n";
                 }
@@ -343,9 +344,6 @@ public class VideoCliend extends Sprite {
                 }
             }
         }
-
-
-
 
 
     }
