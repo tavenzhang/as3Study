@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="taven.animation.frame.FrameLabelInfo"/>
+    <classEntry path="taven.animation.FramePlayer"/>
+    <classEntry path="taven.animation.frame.FrameInfo"/>
+    <classEntry path="taven.animation.frame.FrameSequence"/>
+    <classEntry path="taven.entity.EntityDefinition"/>
+    <classEntry path="taven.manager.TipsManager"/>
+    <classEntry path="taven.manager.CursorManager"/>
+    <classEntry path="taven.manager.FocusManager"/>
+    <classEntry path="taven.manager.ITipsCreator"/>
+    <classEntry path="taven.manager.FrameManager"/>
+    <classEntry path="taven.manager.VersionManager"/>
+    <classEntry path="taven.net.SocketEvent"/>
+    <classEntry path="taven.net.PacketBuffer"/>
+    <classEntry path="taven.net.DataPacket"/>
+    <classEntry path="taven.net.NetProxy"/>
+    <classEntry path="taven.sound.SoundItem"/>
+    <classEntry path="taven.sound.EaxItem"/>
+    <classEntry path="taven.sound.SoundManager"/>
+    <classEntry path="taven.ClientCore"/>
+    <classEntry path="taven.resource.TextLoader"/>
+    <classEntry path="taven.resource.RESLoader"/>
+    <classEntry path="taven.resource.ResourceManager"/>
+    <classEntry path="taven.resource.ResourceItem"/>
+    <classEntry path="taven.resource.DataLoader"/>
+    <classEntry path="taven.resource.SWFLoader"/>
+    <classEntry path="taven.resource.ResourceCache"/>
+    <classEntry path="taven.resource.ImageLoader"/>
+    <classEntry path="taven.manager.Add"/>
+    <classEntry path="taven.utils.Map"/>
+    <classEntry path="taven.map.AstarNode"/>
+    <classEntry path="taven.map.Astar3"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
