@@ -1,0 +1,313 @@
+//////////////////////////////////////////////////////////////////////////////////////登录认证//////////////////////////////////////////////////////////////////////////////////////
+// 用户请求登录
+message am_req_login {
+	optional	bytes 			account 		= 1;						// 玩家在37平台的用户名，用户名支持字母、数字、下划线
+	optional	uint32 			user_id    		= 2;						// 用户编号(暂留)
+	optional	bytes 			password		= 3;						// password 之 MD5(和37合作暂时为空) 
+	optional 	am_login_type		login_type		= 4 [default = lt_tt];				// 登录类型
+	optional	bytes  			machine_id		= 5;						// 客户端机器标识 
+	optional	bytes 			exe_ver			= 6;						// 程序版本号
+	optional	bytes 			ini_ver			= 7;						// 配置版本号
+	optional 	am_client_type		client_type		= 8 [default = at_pc];				// 客户端类型
+	optional	bytes			nickname		= 9;						// 玩家在37平台的昵称, 需进行urlencode($nickname)编码，默认为空
+	optional	int32			game_id			= 10;						// 所属游戏id
+	optional	int32			server_id		= 11;						// 所属服
+	optional	int32			time			= 12;						// 37平台服务器时间戳(为长整数,单位为秒)，时间差在前后5分钟之内
+	optional	int32			client			= 13;						// 登录类型，1为网页，2为微端。默认为1
+	optional	int32			platform		= 14;						// 所属平台，常量值37，不参与MD5加密
+	optional	bytes			sign			= 15;						// strtolower(md5(37ting&game_id=1&server_id=1&time=1436422866&user_name=x))
+};
+
+//客户端类型
+enum am_client_type {
+  at_pc				= 1;			// 电脑pc
+  at_web			= 2;			// 网页web
+  at_android			= 4;			// 安卓系统
+  at_iPhone			= 8;			// 苹果系统 
+};
+
+//用户登录类型
+enum am_login_type {
+  lt_tt							= 0;		// 使用听听登录
+  lt_other_platform					= 1;		// 第三方平台登录
+  rrt_anonymous						= 2;		// 匿名登录
+};
+
+// 用户登录返回
+message am_res_login {	
+	required	sint32			error_code		=   1;	// 错误码
+	optional	am_user_platform_info	user_info		=   2;	// 用户平台信息
+	optional	am_user_extend_info	extend_info		=   3;	// 用户扩展信息
+	optional	bytes  			login_key		=   4; 	// 认证服务器返回的登录私有KEY，自动使用
+	optional    	bytes                   exe_ver         	=   5;  // 程序最新版本号
+	optional    	bytes                   lowest_ver      	=   6;	// 程序支持的最低版本号
+	optional    	bytes                   latest_exe_url  	=   7;  // 最新版本号的下载地址
+};
+
+// 用户平台信息(登录平台上)
+message am_user_platform_info {
+  optional am_user_type_and_id        user_id 			= 1;				//  用户id
+  optional uint64                     version 			= 2 [default = 0];		//  版本号					       
+  optional bytes                      nickname			= 3 [default = ""];		//  用户昵称
+  optional am_sex_type                sex 			= 4 [default = ast_secret];	//  1男;2女;3保密
+  optional bool       		      not_system_administrator  = 5 [default = true];		//  是否为系统管理员(true代表不是系统管理员，false代表是系统管理员)
+  optional bool          	      not_audio_hidden_user     = 6 [default = false];		//  是否为隐身
+  optional am_member_info	      member_info               = 7;				// 	会员属性
+  optional uint32                     partner_id                = 8;				//	合作伙伴和用户来源
+  optional bool                       voice_status 		= 9;				//	语音状态(服务端用，客户端不用)
+  optional bool                       text_status 		= 10;				//	文字状态(服务端用，客户端不用)
+  optional uint32                     vip_level 		= 11;				//	vip级别
+  optional sint32		      sign_status_id		= 12 [default=-1];		//  签约状态;  未签约=-1，签约=0,在X频道中加了主播之后=X（其被添加的频道id）
+};
+
+//用户id
+message am_user_type_and_id {
+  optional sint32	  		  id					= 1;					// 用户id
+  optional am_client_type	 client_type                                    = 2 [default = at_pc];			// 客户端类型
+};
+
+//性别
+enum am_sex_type {
+	ast_male					= 1;		//男
+	ast_female					= 2;		//女
+	ast_secret					= 3;		//保密
+};
+
+// 会员属性
+message am_member_info
+{
+  optional uint64		expired_at		= 1 [default = 0];						// 会员剩余时间（小时）
+  optional bool			expired			= 2 [default = true];					// 会员是否过期
+  optional uint64		score			= 3 [default = 0];						// 会员积分
+};
+
+// 用户扩展信息
+message am_user_extend_info {
+  optional am_user_type_and_id			                user_id 				= 1;				// 用户id
+  optional uint64						version 				= 2;				// 版本号
+  optional uint64						regtime 				= 3;				// 注册时间
+  optional uint32				  		regip 					= 4;				// 注册IP
+  optional uint32			  			featured_game 			        = 5;				// 主打游戏
+};
+
+// 推送物料信息
+message am_notify_materiel {
+	optional	uint32		version				= 1;	// 版本
+	optional	bytes		url				= 2;	// 文件地址
+};
+
+//////////////////////////////////////////////////////////////////////////////////////进频道//////////////////////////////////////////////////////////////////////////////////////
+
+// 请求进入频道
+message am_req_enter_channel {
+  required 			      am_user_type_and_id       user_id 		= 1;				// 用户id
+  required			      uint64			channel_id 		= 2;				// 频道id
+  optional			      uint64			room_id 		= 3;				// 房间id
+  optional			      uint32			client_id 		= 4;				// 客户端ID
+  optional			      bytes			machine_id 		= 5;				// 当前客户端所在机器ID;
+  optional			      uint64			cluster_id 		= 6;				// 从am_response_audio_gate_list中获取的频道和CLUSTER ID;
+  optional			      uint64			cluster_ver 	        = 7;				// 从am_response_audio_gate_list中获取的频道和CLUSTER对应关系版本号;
+  optional			      bytes			password		= 8;				// 房间密码
+  optional			      bytes			login_key   	        = 9; 				// 认证服务器返回的登录私有KEY
+};
+
+message am_res_enter_channel {
+  required			      sint32                    error_code				= 1;						// 错误码
+  optional                            am_user_room_basic_info   user_room_basic_info                    = 2;						// 房间内用户信息
+  optional			      uint64                    channel_id				= 3;						// 频道id
+  optional                            uint64			room_id					= 4;						// 房间id
+  optional		              uint64			today_expenditure                       = 5;						// 今日消费额;
+  optional                            uint64			enter_at				= 6;						// 进入频道时间(绝对时间time(NULL));
+  optional                            uint32			self_ip					= 7;						// 自己的IP 
+};
+
+// 用户基本信息（房间内）
+message am_user_room_basic_info {
+  optional am_user_type_and_id			user_id					= 1;							// 用户id
+  optional am_user_platform_info		user_platform_info		        = 2;							// 用户平台信息(登录平台上)
+  optional am_room_rank_type			room_rank				= 3 [default=rrt_guest];		                // 用户房间内的身份   					                 
+  optional bool					texting_forbidden			= 4;							// 发送文字被禁止 （只有为true才会设置此字段）
+  optional bool					speech_forbidden			= 5;							// 发送语音被禁止
+};
+
+//用户在房间内的身份
+enum am_room_rank_type {
+	rrt_guest							= 10;	// 游客	
+	rrt_vip								= 20;	// VIP（公会房间中无此等级）... 此等级用于消费后用户身份变化并在一段时间后变化
+	rrt_baby							= 30;	// 主播（公会房间中无此等级）
+	rrt_member							= 40;	// 频道会员
+	rrt_vp								= 50;	// 管理员（在公会房间是副会长）
+	rrt_ow								= 60;	// 房主（在公会房间是会长）
+	rrt_system_user						        = 70;	// 系统管理员
+};
+
+// 推送主播列表
+message am_notify_speech_list {
+  optional	uint32							speech_left_time			= 1;				// 剩余时间
+  repeated	am_user_room_basic_info					user_basic_info				= 2;				// 用户基本信息(默认数量20)
+};
+
+//////////////////////////////////////////////////////////////////////////////////////切换房间//////////////////////////////////////////////////////////////////////////////////////
+
+// 切换房间
+message am_req_switch_room {
+  required			uint64			room_id				= 1;							// 房间id
+  optional			bytes			room_password		        = 2;							// 房间密码（密码房才有此值）
+  optional			uint32			client_id			= 3;							// 
+};
+
+message am_res_switch_room {
+  required				sint32		error_code		= 1;				// 错误码
+  optional				 uint64		room_id			= 2;				// 房间id
+};
+
+//////////////////////////////////////////////////////////////////////////////////////麦序列表、时间//////////////////////////////////////////////////////////////////////////////////////
+
+//推送麦序时间
+message am_notify_speech_time {
+  optional	       uint32							time						= 1;								// 当前麦序剩余时间（秒为单位）
+};
+
+//////////////////////////////////////////////////////////////////////////////////////聊天相关//////////////////////////////////////////////////////////////////////////////////////
+
+//客户端登陆文字服务器
+message am_req_client_login_text {
+  required am_user_type_and_id 				user_id 				= 1;			// 用户id
+  required bytes 					login_key   				= 2; 			// 认证服务器返回的登录私有KEY
+};
+
+//客户端登陆文字服务器回应
+message am_res_client_login_text {
+  required sint32 					code					= 1;			// 登陆结果 0 成功 其他 失败
+};
+
+// 请求发送公聊;
+message am_req_public_text {
+  optional am_text_message 				text 				= 2;			// 文字信息
+};
+
+// text信息;
+message am_text_format {
+  optional bytes 		font          			= 1; 			// 字体
+  optional uint32 		size				= 2; 			// 字号
+  optional uint32 		color         			= 3; 			// 颜色
+  optional bool   		is_bold       			= 4; 			// 加粗的
+  optional bool   		is_italic     			= 5; 			// 斜体的
+  optional bool   		is_underlined 			= 6; 			// 下划线
+};
+
+message am_text_message {
+  optional  am_text_format 	format 				= 1; 			// 文字格式;
+  optional           bytes 	text   				= 2; 			// 文字内容;
+};
+
+// 通知公聊信息;
+message am_notify_public_text {
+  optional am_user_draw_info 				user_draw_info 			= 1;			// 操作者
+  optional am_text_message 				text 				= 2;			// 文字信息
+  optional int32					id				= 3;			// 消息序号
+  optional int32					channel_id			= 4;			// 频道id
+  optional int32					room_id				= 5;			// 房间id
+};
+
+// 用户绘制信息(房间内）
+message am_user_draw_info {
+  required am_user_type_and_id			user_id					= 1;						// 用户id
+  optional bytes			       nickname						= 2 [default = ""];			// 用户昵称
+  optional am_sex_type		            sex						= 3 [default = ast_secret];	// 1男;2女;3保密
+  optional am_room_rank_type		      room_rank				= 4 [default=rrt_guest];	// 用户房间内的身份
+};
+
+// 确认收到公聊消息;
+message am_ack_public_text {
+  optional int32					id				= 1;			// 消息序号
+};
+
+// 请求发送私聊;
+message am_req_private_text {
+  optional am_user_type_and_id		dest_id 			= 1;				// 目标用户id
+  optional am_text_message 			text 				= 2;				// 文字信息
+};
+
+message am_res_private_text {
+  required	sint32				error_code		= 1;				// 错误码						  
+};
+
+
+
+// 通知私聊信息;
+message am_notify_private_text {
+  optional am_user_draw_info 	user_draw_info 						= 1;				// 发送者信息
+  optional am_text_message		text 						= 2;				// 文字信息
+  optional int32					channel_id			= 3;				// 频道id
+  optional int32					room_id				= 4;				// 房间id
+  optional int32					on_user_id			= 5;				// 私聊对象id
+};
+
+
+//////////////////////////////////////////////////////////////////////////////////////赠送礼物//////////////////////////////////////////////////////////////////////////////////////
+
+// 请求赠送礼物
+message am_req_give_gift {
+  required int32			      				gift_id				= 1;							// 请求赠送的礼物ID
+  required int32			      				gift_count			= 2;							// 请求赠送的礼物数量
+  required am_user_type_and_id					on_user_id 			= 3;							// 被赠送的用户ID
+  required bytes			      				gift_version		= 4;							// 礼物版本号
+};
+
+message am_res_give_gift {
+  required			sint32					error_code			= 1;								// 错误码
+  optional			int64					money				= 2;								// 钱包余额(送礼金钱不够时，需要返回客户端还剩多少钱)
+};
+
+// 赠送礼物推送
+message am_notify_give_gift {
+  required			am_user_draw_info		user						= 1;								// 赠送者
+  required			am_user_draw_info		on_user						= 2;								// 受赠者
+  required			int32					gift_id						= 3;								// 请求赠送的礼物ID
+  required			int32					gift_count					= 4;								// 请求赠送的礼物数量
+  repeated 			am_gift_prize			prize						= 5;								// 中奖信息
+};
+
+message am_gift_prize {
+  required			      int32			index					= 1;								// 中奖的顺序号（即表明赠送礼物中的第几个中奖）
+  required				  int32			prize_quota 			= 2;								// 中奖倍数
+};
+
+// 服务端推送用户进入房间
+message am_notify_user_enter_room {
+  optional			      int32 			channel_id 		= 1;				// 频道id
+  optional			      int32 			room_id 		= 2;				// 房间id
+  optional			      am_user_draw_info		user_info		= 3;				// 用户信息
+};
+
+//错误吗说明:
+RESULT_SUCCESS			0		返回成功
+DB_ERROR			1001		数据库错误
+CHANNEL_NOT_FOUND		1101		频道不存在
+CHANNEL_FREEZED			1102		频道被封停
+CHANNEL_NO_ENTER		1103		频道禁止进入
+CHANNEL_FORCE_EXITED		1104		被频道踢出，30分钟内不能进入
+CHANNEL_USER_FULL		1105		频道用户数量已经达到上限
+ROOM_NOT_FOUND			1201		房间找不到
+ROOM_PWD_ERROR			1204		房间密码错误
+USER_NOT_AUTHED			1301		用户未通过认证
+USER_FREEZED			1303		账号被封停
+ON_USER_DISCONNECTED		1307		对方已下线
+USER_NOT_IN_SAME_ROOM		1308		用户不在同一房间中
+USER_TEXT_FORBIDDEN		1318		用户被禁止发言
+USER_TEXT_TOO_LONG		1320		文字消息长度过长
+USER_FORBID_CHAT		1321		游客禁止发言
+USER_FORBID_PRIVATE_TO_SELF	1322		不允许自己给自己发私聊
+USER_LOGIN_KEY_ERROR		1324		LOGIN_KEY和用户ID不匹配
+USER_MONEY_NOT_ENOUGH		1326		用户金钱不足
+USER_WALLET_FREEZED		1328		用户钱包被冻结
+USER_NOT_IN_SAME_CHANNEL	1331		用户不在同一频道中
+USER_AUTH_EXPIRED		1338		用户认证失效
+USER_MD5_ERROR			1340		用户MD5值错误
+USER_TIME_OUT			1341		用户请求认证超时
+GIFT_COUNT_INVALID		1501		礼物数量无效
+GIFT_NOT_FOUND			1502		礼物不存在
+GIFT_VERSION_FAIL		1503		礼物版本不一致
+WALLET_PWD_NOT_VERIFIED		1505		钱包密码未验证
+WALLET_PWD_NOT_SET		1506		钱包密码未设置
